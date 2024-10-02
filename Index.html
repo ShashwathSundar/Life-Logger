@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css"  />
+    <style>
+      @media all and (max-width:1000px){
+      .btn-resize {
+        padding: 30px 50px;
+        font-size: 80px;
+        border-radius:20px;
+      }
+      .brand-resize{
+        padding: 30px 50px;
+        font-size: 80px;
+      }
+      .alert-resize{
+        font-size: 40px;
+      }
+      .txt-resize{
+        font-size: 50px;
+      }
+      .border-resize{
+        border-radius: 20px;
+      }
+      .pad-resize{
+        margin-top:20px;
+      }
+      }
+    </style>
+    
+</head>
+<body>
+	<nav class="navbar navbar-expand-sm navbar-dark bg-info brand-resize">
+		<a class="navbar-brand txt-resize" href="#" target="_blank"><b>Life Logger</b></a>
+		<div class="navbar" id="navbarNav">
+		  	<div class="navbar-nav">
+        <a class="nav-item nav-link active alert-resize" href="#" id ="alrt"></a>
+			  </div>
+		</div>
+	  </nav>
+	  <div class="input-group m-2 pad-resize">
+		<input type="text" id="txt" class="form-control shadow-none txt-resize" placeholder="Enter custom text" aria-label="Recipient's username" aria-describedby="basic-addon2">
+		<div class="input-group-append mr-4">
+		  <button class="btn btn-secondary shadow-none txt-resize" type="button" onclick="postFunc(document.getElementById('txt').value)" id="send">Send</button>
+		</div>
+	  </div>
+		<div id="btns"></div>
+  <span hidden id="buttons"><?= buttons ?></span>
+
+<script>
+var btn_list=document.getElementById('buttons').innerHTML.split(',');
+
+btn_list.forEach(function create_btn(val){
+  if(val !='')
+  {var x = document.createElement("INPUT");
+  x.setAttribute("type", "button");
+  x.setAttribute("class","btn btn-lg btn-info float-md-left m-2 shadow-none btn-resize");
+  x.setAttribute("value", val);
+  x.setAttribute("id",val);
+  x.setAttribute("onclick", "postFunc(this.value)");
+  
+  document.getElementById('btns').appendChild(x);}
+}
+);
+function postFunc(val){
+  if (val=='')
+  return;
+		document.getElementById('alrt').innerHTML='('+val+') Updating log...';
+		btn_list.forEach(function create_btn(val){
+ 		if(val !='')
+    document.getElementById(val).disabled=true;
+			});
+		document.getElementById("send").disabled=true;
+		document.getElementById("txt").readOnly=true;
+    
+    google.script.run.withSuccessHandler(alrtFunc).
+                        withFailureHandler(alrtFunc).AddRecord(val);
+}
+function alrtFunc(val){
+  if(val != undefined)
+  document.getElementById('alrt').innerHTML=val;
+
+  setTimeout(function() {document.getElementById('alrt').innerHTML='';
+    },2000);
+    btn_list.forEach(function create_btn(val){
+  if(val !='')
+  document.getElementById(val).disabled=false;
+  });
+    document.getElementById("send").disabled=false;
+    document.getElementById("txt").readOnly=false;
+    document.getElementById("txt").value='';
+  }
+function onFailure(error) {
+   alrtFunc(error);
+    }
+function onSuccess(message) {
+      alrtFunc(message);
+      }
+	</script>
+</body>
+</html>
